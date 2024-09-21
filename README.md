@@ -1,44 +1,18 @@
-# The LLVM Compiler Infrastructure
+# Проект по портированию LLVM на e2k-платформу.
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/llvm/llvm-project/badge)](https://securityscorecards.dev/viewer/?uri=github.com/llvm/llvm-project)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8273/badge)](https://www.bestpractices.dev/projects/8273)
-[![libc++](https://github.com/llvm/llvm-project/actions/workflows/libcxx-build-and-test.yaml/badge.svg?branch=main&event=schedule)](https://github.com/llvm/llvm-project/actions/workflows/libcxx-build-and-test.yaml?query=event%3Aschedule)
+Данный проект основан на форке проекта [llvm-project](https://github.com/llvm/llvm-project) (оригинальный README.md переименован в README.llvm.md). В рамках данного проекта штатное решение по портированию состоит в использовании проприетарного оптимизирующего e2k-бэкенда (из компилятора lcc). Использование e2k-бэкенда реализовано посредством транслятора промежуточных представлений llvm-IR -> EIR (lcc). В процессе трансляции используется транзитное представление [lccrt-IR](https://gitflic.ru/project/e2khome/lccrt).
 
-Welcome to the LLVM project!
+## Правки в llvm.
 
-This repository contains the source code for LLVM, a toolkit for the
-construction of highly optimized compilers, optimizers, and run-time
-environments.
+В силу вышеописанного способа портирования на базе проприетарного e2k-бэкенда непосредственно в проекте llvm-project-e2k реализуется часть транслятора по преобразованию llvm-IR -> lccrt-IR, а также добавляется формальная поддержка target-архитектуры Elbrus. В первом приближении такой подход можно сравнить с WebAssembly-бэкендом.
 
-The LLVM project has multiple components. The core of the project is
-itself called "LLVM". This contains all of the tools, libraries, and header
-files needed to process intermediate representations and convert them into
-object files. Tools include an assembler, disassembler, bitcode analyzer, and
-bitcode optimizer.
+Предполагается, что подобный патч в llvm может представлять интерес в случаях:
+- применение патча для более новых/старых версий llvm отличных от llvm-19 с целью портирования на e2k и/или применения дополнительных собственных патчей силами сторонних разработчиков, если требуемая версия llvm не поддерживается на рассматриваемый момент времени со стороны разработчиков из МЦСТ
+- получения собственных сборок llvm для e2k-платформы, например, с дополнительными отладочными свойствами
+- для частичного упрощения процесса портирования новых llvm-фронтендов для e2k-платформы (например, [go-llvm](https://github.com/go-llvm/llvm) в ситуации ограниченного доступа к e2k-машинам (хотя бы как первые шаги в данном направлении, в том числе, для расширения обратной связи)
+- в качестве "just for fun" разработка для llvm полнофункционального Си-бэкенда (например, lcbe в [lccrt](https://gitflic.ru/project/e2khome/lccrt) и/или упрощение использования в качестве бэкенда [libgccjit](https://github.com/gcc-mirror/gcc/tree/master/gcc/jit) (требуется уточнение вопроса с лицензией по использованию)
 
-C-like languages use the [Clang](https://clang.llvm.org/) frontend. This
-component compiles C, C++, Objective-C, and Objective-C++ code into LLVM bitcode
--- and from there into object files, using LLVM.
+## Сборка.
 
-Other components include:
-the [libc++ C++ standard library](https://libcxx.llvm.org),
-the [LLD linker](https://lld.llvm.org), and more.
+Для сборки нужно стандартным образом добавить Elbrus в target-список cmake параметров и установить параметр -DLLVM_WITH_LCCRT=$PATHTO, где $PATHTO - путь до prefix-установки [liblccrt](https://gitflic.ru/project/e2khome/lccrt).
 
-## Getting the Source Code and Building LLVM
-
-Consult the
-[Getting Started with LLVM](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm)
-page for information on building and running LLVM.
-
-For information on how to contribute to the LLVM project, please take a look at
-the [Contributing to LLVM](https://llvm.org/docs/Contributing.html) guide.
-
-## Getting in touch
-
-Join the [LLVM Discourse forums](https://discourse.llvm.org/), [Discord
-chat](https://discord.gg/xS7Z362),
-[LLVM Office Hours](https://llvm.org/docs/GettingInvolved.html#office-hours) or
-[Regular sync-ups](https://llvm.org/docs/GettingInvolved.html#online-sync-ups).
-
-The LLVM project has adopted a [code of conduct](https://llvm.org/docs/CodeOfConduct.html) for
-participants to all modes of communication within the project.
