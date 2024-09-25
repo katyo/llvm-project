@@ -4648,6 +4648,7 @@ void AssemblyWriter::printInstruction(const Instruction &I) {
 
   // Print a nice comment.
   printInfoComment(I);
+  if (AnnotationWriter) AnnotationWriter->emitInstructionEndAnnot(&I, Out);
 }
 
 void AssemblyWriter::printDbgMarker(const DbgMarker &Marker) {

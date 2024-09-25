@@ -7,6 +7,12 @@
  *===-----------------------------------------------------------------------===
  */
 
+#ifdef __LLVM_LCCRT_INTRIN_tmmintrin_h__
+
+#include __LLVM_LCCRT_INTRIN_tmmintrin_h__
+
+#else /* !__LLVM_LCCRT_INTRIN_tmmintrin_h__ */
+
 #ifndef __TMMINTRIN_H
 #define __TMMINTRIN_H
 
@@ -782,3 +788,5 @@ _mm_sign_pi32(__m64 __a, __m64 __b)
 #undef __DEFAULT_FN_ATTRS_MMX
 
 #endif /* __TMMINTRIN_H */
+
+#endif /* __LLVM_LCCRT_INTRIN_tmmintrin_h__ */

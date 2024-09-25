@@ -33,6 +33,8 @@ function(get_arch_and_system_from_triple triple arch_var sys_var)
   # value.
   if(target_arch MATCHES "^mips")
     set(target_arch "mips")
+  elseif(target_arch MATCHES "^e2k")
+    set(target_arch "e2k")
   elseif(target_arch MATCHES "^arm")
     # TODO(lntue): Shall we separate `arm64`?  It is currently recognized as
     # `arm` here.
@@ -146,6 +148,8 @@ if(LIBC_TARGET_ARCHITECTURE STREQUAL "arm")
   set(LIBC_TARGET_ARCHITECTURE_IS_ARM TRUE)
 elseif(LIBC_TARGET_ARCHITECTURE STREQUAL "aarch64")
   set(LIBC_TARGET_ARCHITECTURE_IS_AARCH64 TRUE)
+elseif(LIBC_TARGET_ARCHITECTURE STREQUAL "e2k")
+  set(LIBC_TARGET_ARCHITECTURE_IS_E2K TRUE)
 elseif(LIBC_TARGET_ARCHITECTURE STREQUAL "x86_64")
   set(LIBC_TARGET_ARCHITECTURE_IS_X86 TRUE)
 elseif(LIBC_TARGET_ARCHITECTURE STREQUAL "riscv64")

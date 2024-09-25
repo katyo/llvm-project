@@ -1417,6 +1417,7 @@ namespace {
 /// CGFunctionInfo should be passed to actual LLVM IR function.
 class ClangToLLVMArgMapping {
   static const unsigned InvalidIndex = ~0U;
+  const TargetInfo &Target;
   unsigned InallocaArgNo;
   unsigned SRetArgNo;
   unsigned TotalIRArgs;
@@ -1437,9 +1438,9 @@ class ClangToLLVMArgMapping {
   SmallVector<IRArgs, 8> ArgInfo;
 
 public:
-  ClangToLLVMArgMapping(const ASTContext &Context, const CGFunctionInfo &FI,
+  ClangToLLVMArgMapping(const TargetInfo &TI, const ASTContext &Context, const CGFunctionInfo &FI,
                         bool OnlyRequiredArgs = false)
-      : InallocaArgNo(InvalidIndex), SRetArgNo(InvalidIndex), TotalIRArgs(0),
+      : Target( TI), InallocaArgNo(InvalidIndex), SRetArgNo(InvalidIndex), TotalIRArgs(0),
         ArgInfo(OnlyRequiredArgs ? FI.getNumRequiredArgs() : FI.arg_size()) {
     construct(Context, FI, OnlyRequiredArgs);
   }
@@ -1510,7 +1511,7 @@ void ClangToLLVMArgMapping::construct(const ASTContext &Context,
     case ABIArgInfo::Direct: {
       // FIXME: handle sseregparm someday...
       llvm::StructType *STy = dyn_cast<llvm::StructType>(AI.getCoerceToType());
-      if (AI.isDirect() && AI.getCanBeFlattened() && STy) {
+      if (AI.isDirect() && AI.getCanBeFlattened() && STy && !Target.getTriple().isArchElbrus()) {
         IRArgs.NumberOfArgs = STy->getNumElements();
       } else {
         IRArgs.NumberOfArgs = 1;
@@ -1606,6 +1607,7 @@ llvm::FunctionType *CodeGenTypes::GetFunctionType(GlobalDecl GD) {
 llvm::FunctionType *
 CodeGenTypes::GetFunctionType(const CGFunctionInfo &FI) {
 
+  llvm::Triple tpl = getABIInfo().getTarget().getTriple();
   bool Inserted = FunctionsBeingProcessed.insert(&FI).second;
   (void)Inserted;
   assert(Inserted && "Recursively being processed?");
@@ -1643,7 +1645,7 @@ CodeGenTypes::GetFunctionType(const CGFunctionInfo &FI) {
     break;
   }
 
-  ClangToLLVMArgMapping IRFunctionArgs(getContext(), FI, true);
+  ClangToLLVMArgMapping IRFunctionArgs( getABIInfo().getTarget(), getContext(), FI, true);
   SmallVector<llvm::Type*, 8> ArgTypes(IRFunctionArgs.totalIRArgs());
 
   // Add type for sret argument.
@@ -1697,7 +1699,7 @@ CodeGenTypes::GetFunctionType(const CGFunctionInfo &FI) {
       // FCAs, so we flatten them if this is safe to do for this argument.
       llvm::Type *argType = ArgInfo.getCoerceToType();
       llvm::StructType *st = dyn_cast<llvm::StructType>(argType);
-      if (st && ArgInfo.isDirect() && ArgInfo.getCanBeFlattened()) {
+      if (!tpl.isArchElbrus() && st && ArgInfo.isDirect() && ArgInfo.getCanBeFlattened()) {
         assert(NumIRArgs == st->getNumElements());
         for (unsigned i = 0, e = st->getNumElements(); i != e; ++i)
           ArgTypes[FirstIRArg + i] = st->getElementType(i);
@@ -2542,7 +2544,7 @@ void CodeGenModule::ConstructAttributeList(StringRef Name,
   }
 
   // Collect attributes from arguments and return values.
-  ClangToLLVMArgMapping IRFunctionArgs(getContext(), FI);
+  ClangToLLVMArgMapping IRFunctionArgs( Target, getContext(), FI);
 
   QualType RetTy = FI.getReturnType();
   const ABIArgInfo &RetAI = FI.getReturnInfo();
@@ -2920,6 +2922,8 @@ namespace {
 void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
                                          llvm::Function *Fn,
                                          const FunctionArgList &Args) {
+  llvm::Triple tpl = getTargetHooks().getABIInfo().getTarget().getTriple();
+
   if (CurCodeDecl && CurCodeDecl->hasAttr<NakedAttr>())
     // Naked functions don't have prologues.
     return;
@@ -2940,7 +2944,7 @@ void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
   // FIXME: We no longer need the types from FunctionArgList; lift up and
   // simplify.
 
-  ClangToLLVMArgMapping IRFunctionArgs(CGM.getContext(), FI);
+  ClangToLLVMArgMapping IRFunctionArgs( getTargetHooks().getABIInfo().getTarget(), CGM.getContext(), FI);  
   assert(Fn->arg_size() == IRFunctionArgs.totalIRArgs());
 
   // If we're using inalloca, all the memory arguments are GEPs off of the last
@@ -3232,7 +3236,7 @@ void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
 
       // Fast-isel and the optimizer generally like scalar values better than
       // FCAs, so we flatten them if this is safe to do for this argument.
-      if (ArgI.isDirect() && ArgI.getCanBeFlattened() && STy &&
+      if (!tpl.isArchElbrus() && ArgI.isDirect() && ArgI.getCanBeFlattened() && STy &&
           STy->getNumElements() > 1) {
         llvm::TypeSize StructSize = CGM.getDataLayout().getTypeAllocSize(STy);
         llvm::TypeSize PtrElementSize =
@@ -5016,6 +5020,7 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
                                  llvm::CallBase **callOrInvoke, bool IsMustTail,
                                  SourceLocation Loc,
                                  bool IsVirtualFunctionPointerThunk) {
+  llvm::Triple tpl = CGM.getTypes().getABIInfo().getTarget().getTriple();
   // FIXME: We no longer need the types from CallArgs; lift up and simplify.
 
   assert(Callee.isOrdinary() || Callee.isVirtual());
@@ -5070,7 +5075,7 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
     ArgMemory = RawAddress(AI, ArgStruct, Align);
   }
 
-  ClangToLLVMArgMapping IRFunctionArgs(CGM.getContext(), CallInfo);
+  ClangToLLVMArgMapping IRFunctionArgs( Target, CGM.getContext(), CallInfo);
   SmallVector<llvm::Value *, 16> IRCallArgs(IRFunctionArgs.totalIRArgs());
 
   // If the call returns a temporary with struct return, create a temporary
@@ -5281,14 +5286,26 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
 
     case ABIArgInfo::Extend:
     case ABIArgInfo::Direct: {
-      if (!isa<llvm::StructType>(ArgInfo.getCoerceToType()) &&
+      if ((tpl.isArchElbrus() || !isa<llvm::StructType>(ArgInfo.getCoerceToType())) &&
           ArgInfo.getCoerceToType() == ConvertType(info_it->type) &&
           ArgInfo.getDirectOffset() == 0) {
         assert(NumIRArgs == 1);
         llvm::Value *V;
-        if (!I->isAggregate())
-          V = I->getKnownRValue().getScalarVal();
-        else
+        if ( !I->isAggregate() ) {
+            RValue RV0 = I->getKnownRValue();
+            
+            if ( RV0.isComplex() ) {
+                auto C0 = RV0.getComplexVal();
+                llvm::Type *Ty = ConvertType( info_it->type);
+
+                V = llvm::UndefValue::get( Ty);
+                V = Builder.CreateInsertValue( V, C0.first, {0});
+                V = Builder.CreateInsertValue( V, C0.second, {1});
+            } else {          
+                assert( RV0.isScalar()); 
+                V = RV0.getScalarVal();
+            }
+        } else 
           V = Builder.CreateLoad(
               I->hasLValue() ? I->getKnownLValue().getAddress()
                              : I->getKnownRValue().getAggregateAddress());

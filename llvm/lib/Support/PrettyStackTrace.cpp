@@ -266,6 +266,10 @@ void PrettyStackTraceProgram::print(raw_ostream &OS) const {
       OS << '"';
   }
   OS << '\n';
+#ifdef LLVM_WITH_LCCRT
+  abort();
+  exit( 1);
+#endif /* LLVM_WITH_LCCRT */
 }
 
 #if ENABLE_BACKTRACES
