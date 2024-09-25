@@ -2006,6 +2006,9 @@ public:
   /// FreeVisContext - Deallocate and null out VisContext.
   void FreeVisContext();
 
+  /// ActOnPragmaAsmInline - Called on well-formed '\#pragma asm_inline'.
+  void ActOnPragmaAsmInline(const Token &Identifier, SourceLocation PragmaLoc);
+
   /// ActOnPragmaVisibility - Called on well formed \#pragma GCC visibility... .
   void ActOnPragmaVisibility(const IdentifierInfo *VisType,
                              SourceLocation PragmaLoc);

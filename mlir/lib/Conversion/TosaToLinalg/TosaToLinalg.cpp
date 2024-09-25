@@ -2062,7 +2062,7 @@ public:
           auto resultIndex = rewriter.create<arith::SelectOp>(
               nestedLoc, predicate, newIndex, oldIndex);
           nestedBuilder.create<linalg::YieldOp>(
-              nestedLoc, ValueRange({resultIndex, resultMax}));
+              nestedLoc, ValueRange(std::initializer_list<Value>{resultIndex, resultMax}));
         });
 
     if (didEncounterError)

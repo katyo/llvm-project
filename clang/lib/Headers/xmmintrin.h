@@ -7,6 +7,12 @@
  *===-----------------------------------------------------------------------===
  */
 
+#ifdef __LLVM_LCCRT_INTRIN_xmmintrin_h__
+
+#include __LLVM_LCCRT_INTRIN_xmmintrin_h__
+
+#else /* !__LLVM_LCCRT_INTRIN_xmmintrin_h__ */
+
 #ifndef __XMMINTRIN_H
 #define __XMMINTRIN_H
 
@@ -3205,3 +3211,5 @@ do { \
 #endif
 
 #endif /* __XMMINTRIN_H */
+
+#endif /* __LLVM_LCCRT_INTRIN_xmmintrin_h__ */

@@ -135,7 +135,11 @@ namespace llvm {
   class TargetOptions {
   public:
     TargetOptions()
-        : UnsafeFPMath(false), NoInfsFPMath(false), NoNaNsFPMath(false),
+        :
+          CodegenLccrt( false), LccrtIpa( false), LccrtAsmtest( false), LccrtJit( false),
+          LccrtCallLong( false), LccrtBackendDebug( false), LccrtBackendOptions( ""),
+          LccrtLlvmIREmbedStaticOnly( false),
+          UnsafeFPMath(false), NoInfsFPMath(false), NoNaNsFPMath(false),
           NoTrappingFPMath(true), NoSignedZerosFPMath(false),
           ApproxFuncFPMath(false), EnableAIXExtendedAltivecABI(false),
           HonorSignDependentRoundingFPMathOption(false), NoZerosInBSS(false),
@@ -156,6 +160,30 @@ namespace llvm {
           PPCGenScalarMASSEntries(false), JMCInstrument(false),
           EnableCFIFixup(false), MisExpect(false), XCOFFReadOnlyPointers(false),
           FPDenormalMode(DenormalMode::IEEE, DenormalMode::IEEE) {}
+
+    /// CodegenLccrt - Use lccrt-backend for code generating.
+    unsigned CodegenLccrt : 1;
+
+    /// LccrtIpa - Use ipa-results in lccrt-backend.
+    unsigned LccrtIpa : 1;
+
+    /// LccrtAsmtest - Use asmtest asm-plugin in lccrt-backend.
+    unsigned LccrtAsmtest : 1;
+
+    /// LccrtJit - Use jit-mode in lccrt-backend.
+    unsigned LccrtJit : 1;
+
+    /// LccrtCallLong - Use only long calls.
+    unsigned LccrtCallLong : 1;
+
+    /// LccrtBackendDebug - Use lccrt-backend debug version.
+    unsigned LccrtBackendDebug : 1;
+
+    /// LccrtBackendOptions - lccrt-backend options.
+    std::string LccrtBackendOptions;
+
+    /// LccrtLlvmIREmbedStaticOnly - embed llvm-ir only in static libs.
+    bool LccrtLlvmIREmbedStaticOnly;
 
     /// DisableFramePointerElim - This returns true if frame pointer elimination
     /// optimization should be disabled for the given machine function.
