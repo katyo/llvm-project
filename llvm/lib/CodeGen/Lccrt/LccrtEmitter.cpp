@@ -2228,10 +2228,15 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
         {"llvm.memset.p0i8.i64",            "__builtin_memset"},
         {"llvm.trap",                       "abort"},
         {"llvm.va_start",                   "__lccrt_va_start"},
+        {"llvm.va_start.p0",                "__lccrt_va_start"},
         {"llvm.va_end",                     "__lccrt_va_end"},
+        {"llvm.va_end.p0",                  "__lccrt_va_end"},
         {"llvm.va_copy",                    "__lccrt_va_copy"},
+        {"llvm.va_copy.p0",                 "__lccrt_va_copy"},
         {"llvm.stacksave",                  "__lccrt_builtin_stacksave"},
+        {"llvm.stacksave.p0",               "__lccrt_builtin_stacksave"},
         {"llvm.stackrestore",               "__lccrt_builtin_stackrestore"},
+        {"llvm.stackrestore.p0",            "__lccrt_builtin_stackrestore"},
         {"llvm.eh.typeid.for",              "__lccrt_eh_typeid_for"},
         {"llvm.returnaddress",              "__builtin_return_address"},
         {"llvm.uadd.with.overflow",         "__lccrt_uadd_overflow",        suff_stdint},
@@ -4788,10 +4793,12 @@ LccrtFunctionEmitter::makeIntMinMax( std::string mname, User &O,
         {
             errorDump( &O);
 
-        } else if ( ((elem_size == 4)
-                     || (elem_size == 8))
-                    && ((num_elems * elem_size == 8)
-                        || (num_elems * elem_size == 16))
+        } else if ( ((elem_size == 1) || (elem_size == 2) || (elem_size == 4) || (elem_size == 8))
+                    && ((num_elems * elem_size == 4)
+                        || (num_elems * elem_size == 8)
+                        || (num_elems * elem_size == 16)
+                        || (num_elems * elem_size == 32)
+                        || (num_elems * elem_size == 64))
                     && isFastLibCall( &O, __FILE__, __LINE__) )
         {
             snprintf( sf, 256, "__lccrt_builtin_%s_v%di%d",
@@ -5355,13 +5362,17 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
             args[0] = makeCallBuiltinAddr( CF, ct, cnl);
 
         } else if ( (cn.compare( "llvm.trap") == 0)
-                    || (cn.compare( "llvm.stacksave") == 0) )
+                    || (cn.compare( "llvm.stacksave") == 0)
+                    || (cn.compare( "llvm.stacksave.p0") == 0) )
         {
             args[0] = makeCallBuiltinAddr( CF, CT, cnl, 0);
 
         } else if ( (cn.compare( "llvm.va_start") == 0)
+                    || (cn.compare( "llvm.va_start.p0") == 0)
                     || (cn.compare( "llvm.va_end") == 0)
-                    || (cn.compare( "llvm.stackrestore") == 0) )
+                    || (cn.compare( "llvm.va_end.p0") == 0)
+                    || (cn.compare( "llvm.stackrestore") == 0)
+                    || (cn.compare( "llvm.stackrestore.p0") == 0) )
         {
             args[0] = makeCallBuiltinAddr( CF, CT, cnl, 1);
 
