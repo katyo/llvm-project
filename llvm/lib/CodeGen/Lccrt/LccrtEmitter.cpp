@@ -6711,6 +6711,8 @@ LccrtFunctionEmitter::makeInsertvalue( const Instruction &O, lccrt_v_ptr res, lc
     lccrt_var_ptr *args = new lccrt_var_ptr[num_args];
     lccrt_type_ptr tu64 = lccrt_type_make_u64( m);
     //lccrt_type_ptr t = le.makeType( IV.getOperand( 0)->getType());
+    lccrt_type_ptr tval = 0;
+    lccrt_type_ptr tvp = lccrt_type_make_pvoid( m);
 
     args[0] = makeValue( IV.getOperand( 0), i);
     if ( (args[0] != res) )
@@ -6722,6 +6724,11 @@ LccrtFunctionEmitter::makeInsertvalue( const Instruction &O, lccrt_v_ptr res, lc
     //t = lccrt_type_make_ptr_type( t);
     //args[0] = le.makeVarConst( t, lccrt_varinit_new_addr_var( args[0]));
     args[1] = makeValue( IV.getOperand( 1), i);
+    tval = lccrt_var_get_type( args[1]);
+    if ( lccrt_type_is_pointer( tval) && (tval != tvp) ) {
+        args[1] = lccrt_oper_get_res( lccrt_oper_new_bitcast( f, args[1], tvp, 0, i));
+    }
+
     for ( const unsigned *k = IV.idx_begin(), *ke = IV.idx_end(); k != ke; ++k, ++j )
     {
         args[j+2] = le.makeVarConst( tu64, lccrt_varinit_new_scalar( tu64, *k));
