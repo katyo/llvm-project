@@ -5445,7 +5445,7 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
 
     } else if ( (cn == "llvm.threadlocal.address.p0") ) {
         args[0] = makeValue( CI.getArgOperand( 0), i);
-        oper = lccrt_oper_new_move( f, args[0], res, i);
+        oper = lccrt_oper_new_bitcast( f, args[0], tpv, res, i);
 
     } else if ( (cn == "llvm.read_register.i32")
                 || (cn == "llvm.read_register.i64")
