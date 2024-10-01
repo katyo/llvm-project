@@ -60,7 +60,6 @@ namespace llvm {
 class Triple;
 class DataLayout;
 class GlobalAlias;
-class GlobalAlias;
 class MCAsmLayout;
 
 class LLVM_LIBRARY_VISIBILITY LccrtContext
@@ -277,6 +276,7 @@ class LLVM_LIBRARY_VISIBILITY LccrtEmitter {
     lccrt_type_ptr makeTypeStruct( StructType *ST, NamedTypes &ntypes);
     lccrt_type_ptr makeTypeDenseVector( Type *T);
     lccrt_type_ptr makeValueType( Value *V);
+    lccrt_type_ptr makeTypeIntNormal( int bitwidth);
     Type *getValueElementType( Value *V);
     lccrt_function_ptr findLibCall( const std::string &S);
     void insertLibCall( const std::string &S, lccrt_function_ptr f);

@@ -2010,6 +2010,30 @@ LccrtEmitter::makeTypeDenseVector( Type *T) {
 } /* LccrtEmitter::makeTypeDenseVector */
 
 /**
+ * Создание целого типа с выравниванием.
+ */
+lccrt_type_ptr
+LccrtEmitter::makeTypeIntNormal( int bitwidth) {
+    lccrt_type_ptr r = 0;
+
+    if ( bitwidth <= 8 ) {
+        r = lccrt_type_make_u8( m);
+    } else if ( bitwidth <= 16 ) {
+        r = lccrt_type_make_u16( m);
+    } else if ( bitwidth <= 32 ) {
+        r = lccrt_type_make_u32( m);
+    } else if ( bitwidth <= 64 ) {
+        r = lccrt_type_make_u64( m);
+    } else if ( bitwidth <= 128 ) {
+        r = lccrt_type_make_u128( m);
+    } else {
+        assert( 0);
+    }
+
+    return (r);
+} /* LccrtEmitter::makeTypeIntNormal */
+
+/**
  * Создание типа.
  */
 lccrt_type_ptr
@@ -4691,6 +4715,9 @@ LccrtFunctionEmitter::makeIntAbs( User &O, lccrt_var_ptr res, lccrt_oi_ptr i)
     std::string func_name = "abs";
     lccrt_type_ptr tu32 = lccrt_type_make_u32( m);
     lccrt_type_ptr tu64 = lccrt_type_make_u64( m);
+    int bitwidth = T1->getPrimitiveSizeInBits();
+    bool normal_int = le.isIntBitWidthNormal( T1);
+    bool isint = isa<IntegerType>( T1);
 
     if ( isa<ScalableVectorType>( T1) ) {
         errorDump( &O);
@@ -4746,16 +4773,32 @@ LccrtFunctionEmitter::makeIntAbs( User &O, lccrt_var_ptr res, lccrt_oi_ptr i)
             func_name = "__lccrt_" + func_name + "_v";
             makeLibCall( func_name.c_str(), true, O, res, true, i);
         }
-    } else if ( le.isIntBitWidthNormal( T1) ) {
+    } else if ( isint && (normal_int || (bitwidth < 64)) ) {
         lccrt_varinit_ptr an;
+        lccrt_type_ptr tint = le.makeTypeIntNormal( bitwidth);
         lccrt_var_ptr v0 = lccrt_var_new_local( f, lccrt_type_make_bool( m), 0);
-        lccrt_var_ptr v1 = lccrt_var_new_local( f, lccrt_var_get_type( a1), 0);
-        lccrt_var_ptr v2 = le.makeVarConstHex( lccrt_var_get_type( a1), 0);
+        lccrt_var_ptr v1 = lccrt_var_new_local( f, tint, 0);
+        lccrt_var_ptr v2 = le.makeVarConstHex( tint, 0);
+        lccrt_var_ptr vr = res;
+
+        if ( !normal_int ) {
+            int tbitlen = 8*lccrt_type_get_bytesize( tint);
+            lccrt_var_ptr bl = le.makeVarConstHex( tint, tbitlen - bitwidth);
+
+            vr = lccrt_var_new_local( f, tint, 0);
+            a1 = lccrt_oper_get_res( makeBitcastNIntToInt( bitwidth, a1, 0, i));
+            a1 = lccrt_oper_get_res( lccrt_oper_new_shl( f, a1, bl, 0, i));
+            a1 = lccrt_oper_get_res( lccrt_oper_new_sar( f, a1, bl, 0, i));
+        }
 
         an = lccrt_varinit_new_scalar( lccrt_type_make_u32( m), LCCRT_CMP_GE_I);
         lccrt_oper_new_sub( f, v2, a1, v1, i);
         lccrt_oper_new_cmp( f, an, a1, v1, v0, i);
-        lccrt_oper_new_select( f, v0, a1, v1, res, i);
+        lccrt_oper_new_select( f, v0, a1, v1, vr, i);
+
+        if ( !normal_int ) {
+            makeBitcastIntToNInt( bitwidth, vr, res, i);
+        }
     } else {
         errorDump( &O);
     }
