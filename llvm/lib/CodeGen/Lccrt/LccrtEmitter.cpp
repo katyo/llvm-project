@@ -2308,6 +2308,7 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
         {"llvm.copysign",                   "__builtin_copysign",           suff_stdfloat},
         {"llvm.is.fpclass",                 "__lccrt_isfpclass",            suff_stdfloatn},
         {"llvm.mulsc3",                     ""},
+        {"llvm.clear_cache",                "__builtin___clear_cache"},
         {"llvm.e2k.loadmas.8u",             "__builtin_loadmas_8u"},
         {"llvm.e2k.loadmas.16u",            "__builtin_loadmas_16u"},
         {"llvm.e2k.loadmas.32u",            "__builtin_loadmas_32u"},
