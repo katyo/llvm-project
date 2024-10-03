@@ -2324,8 +2324,7 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
     };
     lccrt_type_ptr tpv = lccrt_type_make_pvoid( m);
 
-    if ( t )
-    {
+    if ( t ) {
         (*t) = 0;
     }
 
@@ -2369,9 +2368,14 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
         int p0_len = strlen( p0);
 
         if ( (strncmp( s, p0, p0_len) == 0) ) {
-             is_name = true;
-             r = "__builtin_e2k_";
-             r += (s + p0_len);
+            is_name = true;
+            r = "__builtin_e2k_";
+            r += (s + p0_len);
+            for ( int k = p0_len, k1 = r.length(); k <= k1 ; ++k ) {
+                if ( r[k] == '.' ) {
+                    r[k] = '_';
+                }
+            }
         }
     }
 
