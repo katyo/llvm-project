@@ -2251,6 +2251,7 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
         {"llvm.memmove.p0i8.p0i8.i64",      "__builtin_memmove"},
         {"llvm.memset.p0i8.i64",            "__builtin_memset"},
         {"llvm.trap",                       "abort"},
+        {"llvm.debugtrap",                  "abort"},
         {"llvm.va_start",                   "__lccrt_va_start"},
         {"llvm.va_start.p0",                "__lccrt_va_start"},
         {"llvm.va_end",                     "__lccrt_va_end"},
@@ -5412,6 +5413,7 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
             args[0] = makeCallBuiltinAddr( CF, ct, cnl);
 
         } else if ( (cn.compare( "llvm.trap") == 0)
+                    || (cn.compare( "llvm.debugtrap") == 0)
                     || (cn.compare( "llvm.stacksave") == 0)
                     || (cn.compare( "llvm.stacksave.p0") == 0) )
         {
