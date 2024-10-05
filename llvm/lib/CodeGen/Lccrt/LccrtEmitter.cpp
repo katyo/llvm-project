@@ -2275,10 +2275,12 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
         {"llvm.ssub.sat",                   "__lccrt_ssub_sat",             suff_stdint},
         {"llvm.umul.sat",                   "__lccrt_umul_sat",             suff_stdint},
         {"llvm.smul.sat",                   "__lccrt_smul_sat",             suff_stdint},
-        {"llvm.powi.f32",                   "__powisf2"},
-        {"llvm.powi.f32.i32",               "__powisf2"},
-        {"llvm.powi.f64",                   "__powidf2"},
-        {"llvm.powi.f64.i32",               "__powidf2"},
+        {"llvm.powi.f32",                   "__builtin_powif"},
+        {"llvm.powi.f32.i32",               "__builtin_powif"},
+        {"llvm.powi.f64",                   "__builtin_powi"},
+        {"llvm.powi.f64.i32",               "__builtin_powi"},
+        {"llvm.powi.f80",                   "__builtin_powil"},
+        {"llvm.powi.f80.i32",               "__builtin_powil"},
         {"llvm.fabs",                       "__builtin_fabs",               suff_stdfloat},
         {"llvm.exp",                        "__builtin_exp",                suff_stdfloat},
         {"llvm.exp2",                       "__builtin_exp2",               suff_stdfloat},
@@ -5436,6 +5438,8 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
                     || (cn == "llvm.powi.f32.i32")
                     || (cn == "llvm.powi.f64")
                     || (cn == "llvm.powi.f64.i32")
+                    || (cn == "llvm.powi.f80")
+                    || (cn == "llvm.powi.f80.i32")
                     || is_name_suff_stdint( cns, "llvm.uadd.with.overflow")
                     || is_name_suff_stdint( cns, "llvm.sadd.with.overflow")
                     || is_name_suff_stdint( cns, "llvm.usub.with.overflow")
