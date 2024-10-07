@@ -2266,6 +2266,7 @@ LccrtFunctionEmitter::lowerCallName( lccrt_m_ptr m, const char *s, lccrt_type_pt
         {"llvm.returnaddress",              "__builtin_return_address"},
         {"llvm.uadd.with.overflow",         "__lccrt_uadd_overflow",        suff_stdint},
         {"llvm.sadd.with.overflow",         "__lccrt_sadd_overflow",        suff_stdint},
+        {"llvm.sadd.with.overflow.i65",     "__lccrt_sadd_overflow_65"},
         {"llvm.usub.with.overflow",         "__lccrt_usub_overflow",        suff_stdint},
         {"llvm.ssub.with.overflow",         "__lccrt_ssub_overflow",        suff_stdint},
         {"llvm.umul.with.overflow",         "__lccrt_umul_overflow",        suff_stdint},
@@ -5444,6 +5445,7 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
                     || (cn == "llvm.powi.f80.i32")
                     || is_name_suff_stdint( cns, "llvm.uadd.with.overflow")
                     || is_name_suff_stdint( cns, "llvm.sadd.with.overflow")
+                    || (cn == "llvm.sadd.with.overflow.i65")
                     || is_name_suff_stdint( cns, "llvm.usub.with.overflow")
                     || is_name_suff_stdint( cns, "llvm.ssub.with.overflow")
                     || is_name_suff_stdint( cns, "llvm.umul.with.overflow")
