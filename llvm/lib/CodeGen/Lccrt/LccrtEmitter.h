@@ -405,6 +405,8 @@ class LLVM_LIBRARY_VISIBILITY LccrtFunctionEmitter {
     void makePhiArg( lccrt_o_ptr lbl_work, Value *PV, lccrt_v_ptr next_res, lccrt_o_ptr ct, int ct_num, lccrt_oi_ptr i);
     lccrt_oper_ptr makeBitcastNIntToInt( int bitsize, lccrt_v_ptr arg, lccrt_v_ptr res, lccrt_oi_ptr i);
     lccrt_oper_ptr makeBitcastIntToNInt( int bitsize, lccrt_v_ptr arg, lccrt_v_ptr res, lccrt_oi_ptr i);
+    lccrt_var_ptr makeExtInt( lccrt_var_ptr a, int bitwidth, bool sign, lccrt_oper_iterator_ptr i);
+    lccrt_var_ptr makeExtNIntToInt( lccrt_var_ptr a, int bitwidth, bool sign, lccrt_oper_iterator_ptr i);
     lccrt_type_ptr makeDoublingStruct( lccrt_type_ptr type_long, lccrt_type_ptr type_short);
     lccrt_var_ptr allocLocalTmpVar( lccrt_type_ptr type);
     lccrt_var_ptr makeBitcastVar( Type *TA, Type *TR);
