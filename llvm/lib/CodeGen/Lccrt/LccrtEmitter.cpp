@@ -4567,6 +4567,45 @@ LccrtFunctionEmitter::makeFptoiSat( User &O, lccrt_var_ptr res, lccrt_oi_ptr i)
  * Создание операции.
  */
 void
+LccrtFunctionEmitter::makeFrexp( User &O, lccrt_var_ptr res, lccrt_oi_ptr i)
+{
+    Value *V1 = O.getOperand( 0);
+    lccrt_type_ptr tu32 = lccrt_type_make_u32( m);
+    lccrt_var_ptr a1 = makeValue( V1, i);
+    lccrt_var_ptr a2 = 0;
+    lccrt_var_ptr b2 = lccrt_var_new_local( f, tu32, 0);
+    lccrt_var_ptr a0 = lccrt_var_new_local( f, lccrt_var_get_type( a1), 0);
+    struct { lccrt_var_ptr v[3]; } args = {};
+    lccrt_var_ptr cv0 = le.makeVarConstHex( tu32, 0);
+    lccrt_var_ptr cv1 = le.makeVarConstHex( tu32, 1);
+    const CallInst &CI = cast<CallInst>(O);
+    std::string cn = CI.getCalledOperand()->getName().str();
+    const char *oname = 0;
+
+    if ( cn == "llvm.frexp.f32.i32" ) {
+        oname = "frexpf";
+    } else if ( cn == "llvm.frexp.f64.i32" ) {
+        oname = "frexp";
+    } else if ( cn == "llvm.frexp.f80.i32" ) {
+        oname = "frexpl";
+    } else {
+        errorDump( &O);
+    }
+
+    a2 = lccrt_oper_get_res( lccrt_oper_new_varptr( f, b2, 0, i));
+    makeLibCallFast( oname, a1, a2, 0, a0, i);
+    args = {{res, a0, cv0}};
+    lccrt_oper_new_elemwrite( f, 3, args.v, i);
+    args = {{res, b2, cv1}};
+    lccrt_oper_new_elemwrite( f, 3, args.v, i);
+
+    return;
+} /* LccrtFunctionEmitter::makeFrexp */
+
+/**
+ * Создание операции.
+ */
+void
 LccrtFunctionEmitter::makeFshl( User &O, lccrt_var_ptr res, lccrt_oi_ptr i)
 {
     Value *V1 = O.getOperand( 0);
@@ -5386,7 +5425,12 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
         {
             makeFptoiSat( O, res, i);
             return;
-
+        } else if ( (cn == "llvm.frexp.f32.i32")
+                    || (cn == "llvm.frexp.f64.i32")
+                    || (cn == "llvm.frexp.f80.i32") )
+        {
+            makeFrexp( O, res, i);
+            return;
         } else if ( (cn.find( "llvm.bswap.") == 0) ) {
             makeBswap( O, res, i);
             return;

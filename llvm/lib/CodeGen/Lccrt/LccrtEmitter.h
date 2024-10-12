@@ -346,6 +346,7 @@ class LLVM_LIBRARY_VISIBILITY LccrtFunctionEmitter {
     void makeCttz( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
     void makeCtlz( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
     void makeFptoiSat( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
+    void makeFrexp( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
     void makeFshl( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
     void makeFshr( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
     void makeFmuladd( User &O, lccrt_v_ptr res, lccrt_oi_ptr i);
