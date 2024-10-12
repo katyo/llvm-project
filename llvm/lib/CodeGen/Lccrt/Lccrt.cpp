@@ -30,6 +30,7 @@
 #include "llvm/Analysis/TypeBasedAliasAnalysis.h"
 #include "llvm/Support/CodeGen.h"
 #include "llvm/Support/FileSystem.h"
+#include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 #include "llvm/Transforms/Utils/ValueMapper.h"
 
@@ -489,6 +490,7 @@ LccrtPass::runOnModule( Module &M)
     LccrtModuleIpaEmitter mipa = LccrtModuleIpaEmitter( this);
     ModuleSlotTracker MST( &M);
 
+    llvm::SetPrintStack( false);
     reloc_model = (reloc_model == Reloc::Model::DynamicNoPIC) ? Reloc::Model::PIC_ : reloc_model;
 
     if ( !((reloc_model == Reloc::Model::Static)
@@ -755,6 +757,7 @@ LccrtPass::runOnModule( Module &M)
     }
 
     le.deleteModule();
+    llvm::SetPrintStack( true);
 
     return (r);
 } /* LccrtPass::runOnModule */
