@@ -353,10 +353,11 @@ ElbrusTargetInfo::validateAsmConstraint( const char *&Name,
   case 'I':
   case 'J':
     return true;
-  case 'e': // long double x-register, qp-register
+  case 'x': // long double x-register, qp-register
     Info.setAllowsRegister();
     return true;
-  case 'x': // long double x-register
+#if 0
+  case 'e': // long double x-register, qp-register
     Info.setAllowsRegister();
     return true;
   // x86-registers (from gcc)
@@ -376,6 +377,7 @@ ElbrusTargetInfo::validateAsmConstraint( const char *&Name,
   case 'S':
     Info.setAllowsRegister();
     return true;
+#endif
   }
   return false;
 }
