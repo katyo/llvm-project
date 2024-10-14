@@ -41,28 +41,24 @@ using namespace llvm;
 #define is_str_n( s, t, tn) (strncmp( s, t, tn) == 0)
 #define is_str_head( s, t) is_str_n( s, t, strlen( t))
 
-#if !defined(NDEBUG) || defined(LLVM_ENABLE_DUMP)
+#define errorDumpHead( v) \
+  { \
+      fprintf( stderr, "  %s: %s:%d\n", __FUNCTION__, __FILE__, __LINE__); \
+      fflush( stderr); \
+      errs() << "\n" << *(v) << "\n\n"; \
+  }
 #define errorDump( v) \
   { \
-      (v)->dump(); \
-      assert( 0); \
+      fprintf( stderr, "IRLite: error: fails to translate llvm-IR\n"); \
+      errorDumpHead( v); \
       abort(); \
   }
 #define errorDump2( v1, v2) \
   { \
-      (v1)->dump(); \
-      errorDump( v2); \
-  }
-#else /* NDEBUG && !LLVM_ENABLE_DUMP */
-#define errorDump( v) \
-  { \
-      printf( "%s:%s:%d\n", __FUNCTION__, __FILE__, __LINE__); \
-      fflush( stdout); \
-      errs() << *(v) << "\n"; \
+      errorDumpHead( v1); \
+      errorDumpHead( v2); \
       abort(); \
   }
-#define errorDump2( v1, v2) errorDump( v1)
-#endif /* !NDEBUG || LLVM_ENABLE_DUMP */
 
 /**
  * Информация об одном компоненте суффиксе функции.
@@ -5967,6 +5963,9 @@ LccrtFunctionEmitter::makeAsmInline( const CallInst &O, lccrt_var_ptr res, lccrt
                 assert( l_next >= 2);
                 l += l_next - 1;
                 s += s_arg;
+            } else if ( is_str_head( asm_text.c_str() + l, "$$") ) {
+                l += 1;
+                s += "$";
             } else if ( is_str_head( asm_text.c_str() + l, "$(") ) {
                 l += 1;
                 s += "{";
