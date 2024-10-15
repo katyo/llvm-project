@@ -2844,6 +2844,7 @@ LccrtFunctionEmitter::makeOpers()
         {
             Instruction &O = *J;
             lccrt_var_ptr res = 0;
+            lccrt_type_ptr tr = 0;
             lccrt_oper_ptr ct = 0;
             arg_ref_t *alts = alts_pool + cur_ct_alts;
             Value *V1 = O.getNumOperands() ? O.getOperand(0) : 0;
@@ -2862,6 +2863,7 @@ LccrtFunctionEmitter::makeOpers()
            
             if ( !O.getType()->isVoidTy() ) {
                 res = makeValue( cast<Value>(&O));
+                tr = lccrt_var_get_type( res);
             }
 
             if ( (isa<AtomicCmpXchgInst>(O)
@@ -2982,7 +2984,7 @@ LccrtFunctionEmitter::makeOpers()
 
             } else if ( isa<FreezeInst>(O) )
             {
-                lccrt_oper_new_move( f, makeValue( V1, i), res, i);
+                lccrt_oper_new_move( f, makeValuePtrcast( V1, tr, i), res, i);
             } else
             {
                 errorDump( &O);
@@ -7515,6 +7517,8 @@ LccrtFunctionEmitter::makeAtomicrmw( const Instruction &O, lccrt_v_ptr res, lccr
       case AtomicRMWInst::Or:   op = "fetch_or";   break;
       case AtomicRMWInst::Xor:  op = "fetch_xor";  break;
       case AtomicRMWInst::Nand: op = "fetch_nand"; break;
+      case AtomicRMWInst::FAdd: op = "fetch_fadd"; break;
+      case AtomicRMWInst::FSub: op = "fetch_fsub"; break;
       case AtomicRMWInst::Max:  op = "fetch_max";  break;
       case AtomicRMWInst::Min:  op = "fetch_min";  break;
       case AtomicRMWInst::UMax: op = "fetch_umax"; break;
