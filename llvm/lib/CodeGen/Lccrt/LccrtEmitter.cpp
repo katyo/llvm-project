@@ -6170,7 +6170,7 @@ LccrtFunctionEmitter::makeAsmInline( const CallInst &O, lccrt_var_ptr res, lccrt
         }
     }
 
-    for ( int kt = 0; kt < k - 1; ++kt ) {
+    for ( int kt = num_dirouts; kt < k - 1; ++kt ) {
         if ( lccrt_type_is_pointer( fte[kt]) && (fte[kt] != tpv) ) {
             lccrt_oper_ptr p2p = lccrt_oper_new_bitcast( f, args[kt+1], tpv, 0, i);
 
