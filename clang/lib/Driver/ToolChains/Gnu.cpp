@@ -3229,6 +3229,10 @@ bool Generic_GCC::isPICDefaultForced() const {
 
 bool Generic_GCC::IsIntegratedAssemblerDefault() const {
   switch (getTriple().getArch()) {
+  case llvm::Triple::e2k32:
+  case llvm::Triple::e2k64:
+  case llvm::Triple::e2k128:
+    return false;
   case llvm::Triple::nvptx:
   case llvm::Triple::nvptx64:
   case llvm::Triple::xcore:
