@@ -3982,6 +3982,7 @@ LccrtFunctionEmitter::makeBitcastIntToNInt( int bitsize, lccrt_v_ptr a0, lccrt_v
         if ( (bitsize == 1) )
         {
             assert( lccrt_type_is_bool( rtype));
+            oper = lccrt_oper_new_move( f, a0, res, i);
         } else
         {
             assert( lccrt_type_is_int( rtype));
