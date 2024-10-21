@@ -433,9 +433,6 @@ int main(int argc, char **argv, char * const *envp) {
 
   cl::ParseCommandLineOptions(argc, argv,
                               "llvm interpreter & dynamic compiler\n");
-#ifdef __e2k__
-  UseJITKind = JITKind::MCJIT;
-#endif /* __e2k__ */
 
   // If the user doesn't want core files, disable them.
   if (DisableCoreFiles)
