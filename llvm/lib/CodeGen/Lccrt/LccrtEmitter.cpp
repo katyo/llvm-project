@@ -5419,6 +5419,11 @@ LccrtFunctionEmitter::makeCall( Instruction &O, lccrt_v_ptr res, lccrt_oi_ptr i)
             makeLibCallFast( "__lccrt_typetest_unsupported_yet", 0, 0, 0, res, i);
             return;
 
+        } else if ( (cn.find( "llvm.ptr.annotation.") == 0)
+                    || (cn.find( "llvm.annotation.") == 0) )
+        {
+            lccrt_oper_new_move( f, makeValue( O.getOperand( 0), i), res, i);
+            return;
         } else if ( (cn.find( "llvm.fptosi.sat.") == 0)
                     || (cn.find( "llvm.fptoui.sat.") == 0) )
         {
