@@ -1902,6 +1902,9 @@ static void getTrivialDefaultFunctionAttributes(
                                  CodeGenOpts.getFramePointer()));
     }
 
+    if (LangOpts.Aligned)
+      FuncAttrs.addAttribute("aligned", "true");
+
     if (CodeGenOpts.LessPreciseFPMAD)
       FuncAttrs.addAttribute("less-precise-fpmad", "true");
 

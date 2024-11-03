@@ -3981,6 +3981,11 @@ def flccrt_backend_debug : Flag<["-"], "flccrt-backend-debug">, Group<f_Group>,
 def fno_lccrt_backend_debug : Flag<["-"], "fno-lccrt-backend-debug">, Group<f_Group>;
 def flccrt_backend_options : Joined<["-"], "flccrt-backend-options=">, Group<f_Group>, Flags<[NoXarchOption]>;
 
+defm aligned : BoolFOption<"aligned",
+  LangOpts<"Aligned">, DefaultFalse,
+  PosFlag<SetTrue, [CC1Option], "Guarantees only aligned memory access">,
+  NegFlag<SetFalse>>;
+
 // These "special" warning flags are effectively processed as f_Group flags by the driver:
 // Just silence warnings about -Wlarger-than for now.
 def Wlarger_than_EQ : Joined<["-"], "Wlarger-than=">, Group<clang_ignored_f_Group>;

@@ -7436,6 +7436,9 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
     CmdArgs.push_back(Args.MakeArgString(str));
   }
 
+  if (Args.hasFlag(options::OPT_faligned, options::OPT_fno_aligned, 0))
+    CmdArgs.push_back("-faligned");
+
   // Enable vectorization per default according to the optimization level
   // selected. For optimization levels that want vectorization we use the alias
   // option to simplify the hasFlag logic.

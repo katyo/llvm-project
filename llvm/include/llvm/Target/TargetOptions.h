@@ -139,6 +139,7 @@ namespace llvm {
           CodegenLccrt( false), LccrtIpa( false), LccrtAsmtest( false), LccrtJit( false),
           LccrtCallLong( false), LccrtBackendDebug( false), LccrtBackendOptions( ""),
           LccrtLlvmIREmbedStaticOnly( false),
+          Aligned( false),
           UnsafeFPMath(false), NoInfsFPMath(false), NoNaNsFPMath(false),
           NoTrappingFPMath(true), NoSignedZerosFPMath(false),
           ApproxFuncFPMath(false), EnableAIXExtendedAltivecABI(false),
@@ -184,6 +185,12 @@ namespace llvm {
 
     /// LccrtLlvmIREmbedStaticOnly - embed llvm-ir only in static libs.
     bool LccrtLlvmIREmbedStaticOnly;
+
+    /// Aligned - This flag is enabled when the
+    /// -enable-aligned is specified on the command line. This
+    /// specifies that optimizations are allowed to assume that load/store
+    /// adresses to be aligned by memory access size.
+    unsigned Aligned : 1;
 
     /// DisableFramePointerElim - This returns true if frame pointer elimination
     /// optimization should be disabled for the given machine function.
