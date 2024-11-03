@@ -70,6 +70,7 @@ CGOPT(bool, EnableLccrtIpa)
 CGOPT(bool, EnableLccrtAsmtest)
 CGOPT(bool, EnableLccrtJit)
 CGOPT(bool, EnableLccrtBackendDebug)
+CGOPT(bool, EnableAligned)
 CGOPT(bool, EnableUnsafeFPMath)
 CGOPT(bool, EnableNoInfsFPMath)
 CGOPT(bool, EnableNoNaNsFPMath)
@@ -243,6 +244,12 @@ codegen::RegisterCodeGenFlags::RegisterCodeGenFlags() {
       cl::desc("Use lccrt-backend debug version"),
       cl::init(false));
   CGBINDOPT(EnableLccrtBackendDebug);
+
+  static cl::opt<bool> EnableAligned(
+      "enable-aligned",
+      cl::desc("Enable optimizations that assume aligned memory access"),
+      cl::init(false));
+  CGBINDOPT(EnableAligned);
 
   static cl::opt<FramePointerKind> FramePointerUsage(
       "frame-pointer",
@@ -595,6 +602,7 @@ codegen::InitTargetOptionsFromCodeGenFlags(const Triple &TheTriple) {
   Options.LccrtJit = getEnableLccrtJit();
   Options.LccrtBackendDebug = getEnableLccrtBackendDebug();
   Options.LccrtBackendOptions = getLccrtBackendOptions();
+  Options.Aligned = getEnableAligned();
   Options.AllowFPOpFusion = getFuseFPOps();
   Options.UnsafeFPMath = getEnableUnsafeFPMath();
   Options.NoInfsFPMath = getEnableNoInfsFPMath();
@@ -748,6 +756,8 @@ void codegen::setFunctionAttributes(StringRef CPU, StringRef Features,
                           toStringRef(getDisableTailCalls()));
   if (getStackRealign())
     NewAttrs.addAttribute("stackrealign");
+
+  HANDLE_BOOL_ATTR(EnableAlignedView, "aligned");
 
   HANDLE_BOOL_ATTR(EnableUnsafeFPMathView, "unsafe-fp-math");
   HANDLE_BOOL_ATTR(EnableNoInfsFPMathView, "no-infs-fp-math");

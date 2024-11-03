@@ -63,6 +63,7 @@ bool getEnableLccrtIpa();
 bool getEnableLccrtAsmtest();
 bool getEnableLccrtJit();
 bool getEnableLccrtBackendDebug();
+bool getEnableAligned();
 
 bool getEnableUnsafeFPMath();
 
