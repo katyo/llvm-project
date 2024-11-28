@@ -4,6 +4,10 @@ set(LLVM_LINK_COMPONENTS
   FrontendOpenMP
   )
 
+if(LLVM_WITH_LCCRT)
+  set(LLVM_LINK_COMPONENTS ${LLVM_LINK_COMPONENTS} Lccrt)
+endif()
+
 find_first_existing_vc_file("${LLVM_MAIN_SRC_DIR}" llvm_vc)
 find_first_existing_vc_file("${CLANG_SOURCE_DIR}" clang_vc)
 

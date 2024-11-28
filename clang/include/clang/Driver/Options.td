@@ -3983,7 +3983,7 @@ def flccrt_backend_options : Joined<["-"], "flccrt-backend-options=">, Group<f_G
 
 defm aligned : BoolFOption<"aligned",
   LangOpts<"Aligned">, DefaultFalse,
-  PosFlag<SetTrue, [CC1Option], "Guarantees only aligned memory access">,
+  PosFlag<SetTrue, [], [ClangOption, CC1Option], "Guarantees only aligned memory access">,
   NegFlag<SetFalse>>;
 
 // These "special" warning flags are effectively processed as f_Group flags by the driver:
