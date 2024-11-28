@@ -12,6 +12,7 @@ add_llvm_component_library(LLVMLccrt
   LINK_COMPONENTS
   Analysis
   Core
+  Target
   TransformUtils
   )
 
