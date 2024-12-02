@@ -2089,6 +2089,8 @@ LccrtEmitter::makeType( Type *T, std::map<Type *, lccrt_type_ptr> &ntypes)
           case Type::VoidTyID:
             t = lccrt_type_make_void( m);
             break;
+          case Type::HalfTyID:
+          case Type::BFloatTyID:
           case Type::FloatTyID:
           case Type::DoubleTyID:
           case Type::X86_FP80TyID:
